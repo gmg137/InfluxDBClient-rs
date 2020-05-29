@@ -1,13 +1,11 @@
-use influx_db_client::{
-    point, points, reqwest::Url, Client, Point, Points, Precision, UdpClient, Value,
-};
-use std::fs::File;
-use std::io::Read;
+use influx_db_client::{point, points, Client, Point, Points, Precision, UdpClient, Value};
+use isahc::prelude::*;
 use std::thread::sleep;
 use std::time::Duration;
+use url::Url;
 
 fn block_on<F: std::future::Future>(f: F) -> F::Output {
-    tokio::runtime::Runtime::new().unwrap().block_on(f)
+    async_std::task::block_on(f)
 }
 
 #[test]
@@ -232,14 +230,10 @@ bind-address = "127.0.0.1:{rpc_port}"
         thread::sleep(Duration::from_millis(500));
     }
 
-    let mut ca_cert_file = File::open(tls_cert_path.as_str()).unwrap();
-    let mut ca_cert_buffer = Vec::new();
-    ca_cert_file.read_to_end(&mut ca_cert_buffer).unwrap();
+    let cert = isahc::config::CaCertificate::file(&tls_cert_path);
 
-    let cert = reqwest::Certificate::from_pem(&ca_cert_buffer).unwrap();
-
-    let http_client = reqwest::Client::builder()
-        .add_root_certificate(cert)
+    let http_client = isahc::HttpClient::builder()
+        .ssl_ca_certificate(cert)
         .build()
         .unwrap();
 

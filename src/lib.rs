@@ -67,5 +67,3 @@ pub(crate) mod serialization;
 pub use client::{Client, UdpClient};
 pub use error::Error;
 pub use keys::{ChunkedQuery, Node, Point, Points, Precision, Query, Series, Value};
-
-pub use reqwest;

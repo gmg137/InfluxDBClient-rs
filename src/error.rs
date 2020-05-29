@@ -39,8 +39,14 @@ impl From<io::Error> for Error {
     }
 }
 
-impl From<reqwest::Error> for Error {
-    fn from(err: reqwest::Error) -> Self {
+impl From<isahc::Error> for Error {
+    fn from(err: isahc::Error) -> Self {
+        Error::Communication(format!("{}", err))
+    }
+}
+
+impl From<serde_json::Error> for Error {
+    fn from(err: serde_json::Error) -> Self {
         Error::Communication(format!("{}", err))
     }
 }
